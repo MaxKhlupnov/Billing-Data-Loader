@@ -1,0 +1,5 @@
+yc_oauth_token = "my_yc_oauth_token" # https://cloud.yandex.com/docs/iam/concepts/authorization/oauth-token
+yc_cloud_id    = "my_yc_cloud_id"
+yc_folder_id   = "my_yc_folder_id"
+yc_main_zone   = "ru-central1-a" # ru-central1-b or ru-central1-c
+
