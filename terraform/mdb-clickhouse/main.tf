@@ -44,7 +44,7 @@ variable "database_version" {
 }
 
 variable "labels" {
-  type = "map"
+  type = map(any)
   default = {
     deployment = "terraform"
   }
@@ -122,12 +122,12 @@ variable "zk_hosts" {
 
 
 variable "zk_resource_preset_id" {
-  type    = "string"
+  type    = string
   default = "s2.micro"
 }
 
 variable "zk_disk_type_id" {
-  type    = "string"
+  type    = string
   default = "network-hdd"
 }
 

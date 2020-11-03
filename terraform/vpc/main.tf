@@ -1,10 +1,10 @@
 variable "network_name" {
-  type    = "string"
+  type    = string
   default = "default"
 }
 
 variable "network_id" {
-  type    = "string"
+  type    = string
   default = ""
 }
 
@@ -25,5 +25,5 @@ resource "yandex_vpc_subnet" "subnet" {
   name           = keys(var.subnets)[count.index]
   zone           = lookup(var.subnets, keys(var.subnets)[count.index]).zone
   v4_cidr_blocks = lookup(var.subnets, keys(var.subnets)[count.index]).v4_cidr_blocks
-  network_id     = "${yandex_vpc_network.vpc_network.id}"
+  network_id     = yandex_vpc_network.vpc_network.id
 }

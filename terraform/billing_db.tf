@@ -21,7 +21,7 @@ module "managed-clickhouse-billing-cluster" {
   }
   #environment = "PRESTABLE"
 
-  resource_preset_id = "s2.micro"
+  resource_preset_id = "s2.micro" #s2.small
   disk_size          = 50 #GiB
   disk_type_id       = "network-ssd"
 
@@ -29,7 +29,7 @@ module "managed-clickhouse-billing-cluster" {
     {
       zone           = var.yc_main_zone,
       subnet_id        = module.billing-vpc.subnet_ids_by_names["billing-data-subnet"]
-      assign_public_ip = false
+      assign_public_ip = true
       shard_name       = "billing1"
     }
   ]
