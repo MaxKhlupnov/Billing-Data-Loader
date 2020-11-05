@@ -2,4 +2,7 @@ yc_oauth_token = "my_yc_oauth_token" # https://cloud.yandex.com/docs/iam/concept
 yc_cloud_id    = "my_yc_cloud_id"
 yc_folder_id   = "my_yc_folder_id"
 yc_main_zone   = "ru-central1-a" # ru-central1-b or ru-central1-c
-
+storage_bucket = "" # Yandex object storage Bucket importing from
+storage_folder = "" # Folder name inside bucket (usually it is yc-billing-export or yc-billing-export-with-resources)
+aws_access_key_id = "" # AWS Access Key for Yandex Object storage
+aws_secret_access_key = "" # Aws Access Secret Key for Yandex Object storage

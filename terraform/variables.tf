@@ -27,3 +27,27 @@ variable "billing_db_name" {
   default     = "yc-billing"
   type        = string
 }
+
+variable "storage_bucket" {
+  description = "Yandex object storage Bucket importing from"
+  default     = "billing-info"
+  type        = string
+}
+
+variable "storage_folder" {
+  description = "Folder name inside bucket (usually it is yc-billing-export or yc-billing-export-with-resources)"
+  default     = "yc-billing-export"
+  type        = string
+}
+
+variable "aws_access_key_id" {
+    description = "AWS Access Key for Yandex Object storage"
+    default     = ""
+    type        = string
+}
+
+variable "aws_secret_access_key" {
+    description = "Aws Access Secret Key for Yandex Object storage"
+    default     = ""
+    type        = string
+}

@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import boto3
 from datetime import datetime
-from io import BytesIO
+from io import BytesIO, StringIO
 import os
 
 CH_PASSWORD = os.environ['CH_PASSWORD']
@@ -138,8 +138,8 @@ def handler(event, context):
         obj_list = s3.list_objects_v2(**kwargs)
         try:
             for key in obj_list['Contents']:
-                get_object_response = s3.get_object(Bucket=BUCKET, Key=key['Key'])['Body'].read()
-                df = pd.read_csv(BytesIO(get_object_response))
+                get_object_response = s3.get_object(Bucket=BUCKET, Key=key['Key'])['Body'].read().decode('utf-8')
+                df = pd.read_csv(StringIO(get_object_response))
                 shape_df(df)
                 for part_dt in df["date"].unique():
                     q = '''ALTER TABLE ''' + TABLE + ''' DROP PARTITION ''' + pd.to_datetime(part_dt).strftime("'%Y-%m-%d'")
