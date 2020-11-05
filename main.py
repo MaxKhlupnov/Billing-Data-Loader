@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import boto3
 from datetime import datetime
-from io import StringIO
+from io import BytesIO
 import os
 
 CH_PASSWORD = os.environ['CH_PASSWORD']
@@ -46,7 +46,7 @@ def get_clickhouse_df(query, host=CH_HOST, connection_timeout=1500):
 
 
 def upload(table, content, host=CH_HOST):
-    content = content.encode('utf-8')
+    content = content.replace('\r\n','\n').encode('utf-8')
     query_dict = {
         'query': 'INSERT INTO ' + table + ' FORMAT TabSeparatedWithNames '
     }
@@ -57,6 +57,15 @@ def upload(table, content, host=CH_HOST):
     else:
         raise ValueError(r.text)
 
+# Remove label columns
+def remove_labels_columns(df: pd.DataFrame):
+    for column_key in df.columns.tolist():
+        if column_key.startswith('label.'):
+            df.drop(column_key, axis=1, inplace=True)
+    #cols_total: Set[Any] = set(df.columns)
+    #diff: Set[Any] = cols_total - columns
+    #df.drop(diff, axis=1, inplace=True)
+
 # Shape Data
 def shape_df(tmp_df):
     tmp_df["date"] = pd.to_datetime(tmp_df["date"]).dt.round('D')
@@ -64,38 +73,43 @@ def shape_df(tmp_df):
     tmp_df["pricing_quantity"]=tmp_df["pricing_quantity"].round(10)
     tmp_df["cost"]=tmp_df["cost"].round(10)
     tmp_df["credit"]=tmp_df["credit"].round(10)
-    tmp_df["credit.committed_use_discount"]=tmp_df["credit.committed_use_discount"].round(10)
-    tmp_df["credit.grant"]=tmp_df["credit.grant"].round(10)
-    tmp_df["credit.volume_discount"]=tmp_df["credit.volume_discount"].round(10)
-    tmp_df["credit.misc"]=tmp_df["credit.misc"].round(10)
+    tmp_df["monetary_grant_credit"]=tmp_df["monetary_grant_credit"].round(10)
+    tmp_df["volume_incentive_credit"]=tmp_df["volume_incentive_credit"].round(10)
+    tmp_df["cud_credit"]=tmp_df["cud_credit"].round(10)
+    tmp_df["misc_credit"]=tmp_df["misc_credit"].round(10)
+    remove_labels_columns(tmp_df)
     return tmp_df
 
 def handler(event, context):
     q = '''
     CREATE TABLE IF NOT EXISTS ''' + TABLE+'''
     (
-        billing_account_id	String,
-        cloud_id String,	
-        currency String,	
-        service_id	String,
-        service_name String,	
-        sku_id	String,
-        sku_name String,	
-        date date,	
-        pricing_quantity decimal(25,10),	
-        cost	decimal(25,10),
-        credit	decimal(25,10),
-        credit_committed_use_discount decimal(25,10),	
-        credit_grant decimal(25,10),	
-        credit_volume_discount	decimal(25,10),
-        credit_misc decimal(25,10),	
-        created_at	int,
-        locale String,	
+        billing_account_id	String, 
+        billing_account_name String,
+        cloud_id String,
+        cloud_name String,	
         folder_id String,
         folder_name	String,
+        resource_id	String,
+        service_id	String,
+        service_name String,
+        sku_id	String,
+        sku_name String,
+        date date,      
+        currency String,	      	
+        pricing_quantity decimal(25,10),
+        pricing_unit String,	
+        cost	decimal(25,10),
+        credit	decimal(25,10),
+        monetary_grant_credit 	decimal(25,10),
+        volume_incentive_credit 	decimal(25,10),
+        cud_credit 	decimal(25,10),
+        misc_credit decimal(25,10),                
+        locale String,
+        updated_at	int,	        
         exported_at String
     )
-    ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/''' + TABLE+'''', '{replica}') 
+    ENGINE = MergeTree
     PARTITION BY date 
     ORDER BY (date, sku_id) 
     '''
@@ -124,8 +138,8 @@ def handler(event, context):
         obj_list = s3.list_objects_v2(**kwargs)
         try:
             for key in obj_list['Contents']:
-                get_object_response = s3.get_object(Bucket=BUCKET, Key=key['Key'])
-                df = pd.read_csv(StringIO(get_object_response['Body'].read().decode('utf-8')))
+                get_object_response = s3.get_object(Bucket=BUCKET, Key=key['Key'])['Body'].read()
+                df = pd.read_csv(BytesIO(get_object_response))
                 shape_df(df)
                 for part_dt in df["date"].unique():
                     q = '''ALTER TABLE ''' + TABLE + ''' DROP PARTITION ''' + pd.to_datetime(part_dt).strftime("'%Y-%m-%d'")
@@ -146,4 +160,4 @@ def handler(event, context):
         'isBase64Encoded': False,
     }
 
-#handler('','')
+handler('','')

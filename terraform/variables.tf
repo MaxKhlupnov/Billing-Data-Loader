@@ -21,3 +21,9 @@ variable "yc_main_zone" {
   default     = "ru-central1-a"
   type        = string
 }
+
+variable "billing_db_name" {
+  description = "Clickhouse database name for storing billing records"
+  default     = "yc-billing"
+  type        = string
+}

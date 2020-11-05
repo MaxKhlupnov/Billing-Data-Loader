@@ -33,4 +33,22 @@ module "managed-clickhouse-billing-cluster" {
       shard_name       = "billing1"
     }
   ]
+   databases = [
+    {
+      name  = var.billing_db_name
+      owner = "billing_db_user"
+    }
+  ]
+  users = [
+    {
+      name     = "billing_db_user"
+      password = random_password.password.result
+    }
+  ]
+  user_permissions = {
+    "billing_db_user" : [
+      {
+        database_name = var.billing_db_name
+      }
+    ]}
 }
