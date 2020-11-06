@@ -25,6 +25,17 @@ Solution cvan be deployed via terraform or script based procedure
 </code></pre>
 </li>
 
+<li>
+<p><div>Terraform playbook will create Clickhouse single node instance, service account, function and trigger in your cloud tenant.</div>
+To verify your installation and check resources config run command.</p>
+<pre><code>$ terraform plan</code></pre>
+</li>
+<li><p>Deploy cloud resources.</p>
+  <div><em>To deploy resources into your cloud subscription run command:</em></div>
+<pre><code>$ terraform apply</code></pre>
+</li>
+<li>Confirm resources creation.</li>
+
 </ol>
 
 # Deployment with scripts
