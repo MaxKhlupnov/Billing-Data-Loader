@@ -36,7 +36,7 @@ To verify your installation and check resources config run command.</em></p>
 </code></pre>
 </li>
 <li>Confirm resources creation.</li>
-<li>
+</ol>
 # Deployment with scripts
 ## Create ClickHouse database
 
