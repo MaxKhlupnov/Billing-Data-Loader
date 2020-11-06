@@ -11,6 +11,33 @@ Also you need to have Service Account and access keys to access Object Storage (
     $ yc resource-manager folder add-access-binding <Folder-Name> \
     --subject serviceAccount:<ServiceAccount-ID> --role editor
 
+Solution cvan be deployed via terraform or script based procedure 
+
+# Deployment with Terraform
+<ol>
+<li>Pack function artifacts into zip-file:
+<pre><code>$ zip dist.zip main.py requirements.txt CA.pem
+</code></pre>
+  <li>Switch to "terraform" folder and rename terraform.example.tfvars file into terraform.tfvars</li>
+  <li>Specify variables in terraform.tfvars according to your tenant settings.</li>
+<li>To initialize terraform state call:
+<pre><code>$ terraform init
+</code></pre>
+</li>
+<li>
+<p><em>Terraform playbook will create Clickhouse single node instance, service account, function and trigger in your cloud </br>
+To verify your installation and check resources config run command.</em></p>
+<pre><code>$ terraform plan
+</code></pre>
+</li>
+<li><p>Deploy cloud resources.</p>
+  <div><em>To deploy resources into your cloud subscription run command:</em></div>
+<pre><code>$ terraform apply
+</code></pre>
+</li>
+<li>Confirm resources creation.</li>
+<li>
+# Deployment with scripts
 ## Create ClickHouse database
 
 Before we start deploying, we need to create ClickHouse database
